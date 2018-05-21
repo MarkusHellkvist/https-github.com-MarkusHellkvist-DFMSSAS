@@ -1,0 +1,633 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1200,
+  "model": {
+    "culture": "sv-SE",
+    "dataSources": [
+      {
+        "name": "SqlServer DESKTOP-575EBG3SQL2017 DFMStaging",
+        "connectionString": "Provider=SQLNCLI11;Data Source=DESKTOP-575EBG3\\SQL2017;Initial Catalog=DFMStaging;Integrated Security=SSPI;Persist Security Info=false",
+        "impersonationMode": "impersonateAccount",
+        "account": "markushellqvist@gmail.com",
+        "annotations": [
+          {
+            "name": "ConnectionEditUISource",
+            "value": "SqlServer"
+          }
+        ]
+      },
+      {
+        "name": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW",
+        "connectionString": "Provider=SQLNCLI11;Data Source=DESKTOP-575EBG3\\SQL2017;Initial Catalog=DFMDW;Integrated Security=SSPI;Persist Security Info=false",
+        "impersonationMode": "impersonateAccount",
+        "account": "markushellqvist@gmail.com",
+        "annotations": [
+          {
+            "name": "ConnectionEditUISource",
+            "value": "SqlServer"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "Staging",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "int64",
+            "sourceColumn": "ID",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "PlateID",
+            "dataType": "string",
+            "sourceColumn": "PlateID",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "RegistrationState",
+            "dataType": "string",
+            "sourceColumn": "RegistrationState",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "PlateType",
+            "dataType": "string",
+            "sourceColumn": "PlateType",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "IssueDate",
+            "dataType": "dateTime",
+            "sourceColumn": "IssueDate",
+            "formatString": "General Date",
+            "sourceProviderType": "DBDate"
+          },
+          {
+            "name": "ViolationCode",
+            "dataType": "int64",
+            "sourceColumn": "ViolationCode",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "VehicleBodyTypeID",
+            "dataType": "string",
+            "sourceColumn": "VehicleBodyTypeID",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "VehicleMakeID",
+            "dataType": "string",
+            "sourceColumn": "VehicleMakeID",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "IssuingAgency",
+            "dataType": "string",
+            "sourceColumn": "IssuingAgency",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "ViolationLocation",
+            "dataType": "int64",
+            "sourceColumn": "ViolationLocation",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "IssuerCode",
+            "dataType": "int64",
+            "sourceColumn": "IssuerCode",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "ViolationTime",
+            "dataType": "int64",
+            "sourceColumn": "ViolationTime",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "ViolationCounty",
+            "dataType": "string",
+            "sourceColumn": "ViolationCounty",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "HouseNumber",
+            "dataType": "string",
+            "sourceColumn": "HouseNumber",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "StreetName",
+            "dataType": "string",
+            "sourceColumn": "StreetName",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "IntersectingStreet",
+            "dataType": "string",
+            "sourceColumn": "IntersectingStreet",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "VehicleColorID",
+            "dataType": "int64",
+            "sourceColumn": "VehicleColorID",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "VehicleYear",
+            "dataType": "int64",
+            "sourceColumn": "VehicleYear",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "ViolationPostCode",
+            "dataType": "string",
+            "sourceColumn": "ViolationPostCode",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "ViolationDescription",
+            "dataType": "string",
+            "sourceColumn": "ViolationDescription",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Staging",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[Staging].* FROM [dbo].[Staging] ",
+              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMStaging"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "LastDate",
+            "expression": " MAX(Staging[IssueDate])"
+          },
+          {
+            "name": "StartDate",
+            "expression": " MIN(Staging[IssueDate])"
+          },
+          {
+            "name": "CountRows",
+            "expression": " count(Staging[ID])"
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[Staging].* FROM [dbo].[Staging] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Staging"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimBodyType",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "int64",
+            "sourceColumn": "ID",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "BodyType",
+            "dataType": "string",
+            "sourceColumn": "BodyType",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimBodyType",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[DimBodyType].* FROM [dbo].[DimBodyType] ",
+              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimBodyType].* FROM [dbo].[DimBodyType] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimBodyType"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimCarBrands",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "int64",
+            "sourceColumn": "ID",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Brand",
+            "dataType": "string",
+            "sourceColumn": "Brand",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimCarBrands",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[DimCarBrands].* FROM [dbo].[DimCarBrands] ",
+              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimCarBrands].* FROM [dbo].[DimCarBrands] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimCarBrands"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimColor",
+        "columns": [
+          {
+            "name": "ID",
+            "dataType": "int64",
+            "sourceColumn": "ID",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "BodyType",
+            "dataType": "string",
+            "sourceColumn": "BodyType",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimColor",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[DimColor].* FROM [dbo].[DimColor] ",
+              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimColor].* FROM [dbo].[DimColor] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimColor"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimDistrict",
+        "columns": [
+          {
+            "name": "Pricinct",
+            "dataType": "int64",
+            "sourceColumn": "Pricinct",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Borough",
+            "dataType": "string",
+            "sourceColumn": "Borough",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimDistrict",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[DimDistrict].* FROM [dbo].[DimDistrict] ",
+              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimDistrict].* FROM [dbo].[DimDistrict] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimDistrict"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimStates",
+        "columns": [
+          {
+            "name": "State Name",
+            "dataType": "string",
+            "sourceColumn": "State Name",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "StateCode",
+            "dataType": "string",
+            "sourceColumn": "StateCode",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimStates",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[DimStates].* FROM [dbo].[DimStates] ",
+              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimStates].* FROM [dbo].[DimStates] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimStates"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DimViolationCode",
+        "columns": [
+          {
+            "name": "Code",
+            "dataType": "int64",
+            "sourceColumn": "Code",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Definition",
+            "dataType": "string",
+            "sourceColumn": "Definition",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "ManhattanLower",
+            "dataType": "int64",
+            "sourceColumn": "ManhattanLower",
+            "sourceProviderType": "Integer"
+          },
+          {
+            "name": "Other",
+            "dataType": "int64",
+            "sourceColumn": "Other",
+            "sourceProviderType": "Integer"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimViolationCode",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[DimViolationCode].* FROM [dbo].[DimViolationCode] ",
+              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimViolationCode].* FROM [dbo].[DimViolationCode] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimViolationCode"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DIMDATE",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Date]"
+          },
+          {
+            "type": "calculated",
+            "name": "Year",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " YEAR('DIMDATE'[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "QuarterName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " CONCATENATE(\"Q\", ROUNDUP(MONTH(DIMDATE[Date])/3,0))"
+          },
+          {
+            "type": "calculated",
+            "name": "Month",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " MONTH(DIMDATE[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "Season",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " if(DIMDATE[Month]<3,\"Winter\", if(DIMDATE[Month]=12,\"Winter\", if(DIMDATE[Month]<6,\"Spring\", if(DIMDATE[Month]<9,\"Summar\",\"Fall\"))))"
+          },
+          {
+            "type": "calculated",
+            "name": "Day",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " DAY(DIMDATE[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "Weekday",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " WEEKDAY(DIMDATE[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "WeekdayName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "FORMAT(DIMDATE[Date],\"DDDD\")"
+          },
+          {
+            "type": "calculated",
+            "name": "MonthName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(DIMDATE[Date],\"MMMM\")"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "CALENDAR(FIRSTDATE(Staging[IssueDate]),LASTDATE(Staging[IssueDate]))"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Hours",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Hours",
+            "dataType": "int64",
+            "isNameInferred": false,
+            "isDataTypeInferred": true,
+            "sourceColumn": "[Value]"
+          },
+          {
+            "type": "calculated",
+            "name": "TimeOfDay",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " if(Hours[Hours]<5,\"Night\",if(Hours[Hours]<12,\"Morning\",if(Hours[Hours]<18,\"Afternoon\",if(Hours[Hours]<24,\"Evening\"))))"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": " GENERATESERIES(0,23)"
+            }
+          }
+        ]
+      },
+      {
+        "name": "CalculatedTable 1",
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated"
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "1fc1141f-314d-4538-a671-cb57b2c27680",
+        "fromTable": "Staging",
+        "fromColumn": "IssueDate",
+        "toTable": "DIMDATE",
+        "toColumn": "Date"
+      },
+      {
+        "name": "02f68017-8910-47ae-b59f-5f52018e47f0",
+        "fromTable": "Staging",
+        "fromColumn": "VehicleMakeID",
+        "toTable": "DimCarBrands",
+        "toColumn": "ID"
+      },
+      {
+        "name": "f8710fc3-b56b-4e80-bc15-4c9693996f97",
+        "fromTable": "Staging",
+        "fromColumn": "VehicleBodyTypeID",
+        "toTable": "DimBodyType",
+        "toColumn": "ID"
+      },
+      {
+        "name": "4f2540ba-fc41-4411-8174-8b7d6a9628fc",
+        "fromTable": "Staging",
+        "fromColumn": "ViolationCode",
+        "toTable": "DimViolationCode",
+        "toColumn": "Code"
+      },
+      {
+        "name": "9777135e-f3a1-4aac-8eba-26bfdedb3505",
+        "fromTable": "Staging",
+        "fromColumn": "VehicleColorID",
+        "toTable": "DimColor",
+        "toColumn": "ID"
+      },
+      {
+        "name": "22536345-8da9-453e-800e-65d41d24c3e4",
+        "fromTable": "Staging",
+        "fromColumn": "RegistrationState",
+        "toTable": "DimStates",
+        "toColumn": "State Name"
+      },
+      {
+        "name": "17f18260-fb9c-4430-8766-9ff418fa4a9a",
+        "fromTable": "Staging",
+        "fromColumn": "ViolationLocation",
+        "toTable": "DimDistrict",
+        "toColumn": "Pricinct"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "400"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}
