@@ -5,8 +5,8 @@
     "culture": "sv-SE",
     "dataSources": [
       {
-        "name": "SqlServer DESKTOP-575EBG3SQL2017 DFMStaging",
-        "connectionString": "Provider=SQLNCLI11;Data Source=DESKTOP-575EBG3\\SQL2017;Initial Catalog=DFMStaging;Integrated Security=SSPI;Persist Security Info=false",
+        "name": "FactTable",
+        "connectionString": "Provider=SQLNCLI11;Data Source=DESKTOP-575EBG3\\SQL2017;Initial Catalog=DFMDW;Integrated Security=SSPI;Persist Security Info=false",
         "impersonationMode": "impersonateAccount",
         "account": "markushellqvist@gmail.com",
         "annotations": [
@@ -17,7 +17,7 @@
         ]
       },
       {
-        "name": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW",
+        "name": "DimTables",
         "connectionString": "Provider=SQLNCLI11;Data Source=DESKTOP-575EBG3\\SQL2017;Initial Catalog=DFMDW;Integrated Security=SSPI;Persist Security Info=false",
         "impersonationMode": "impersonateAccount",
         "account": "markushellqvist@gmail.com",
@@ -31,7 +31,7 @@
     ],
     "tables": [
       {
-        "name": "Staging",
+        "name": "Fact",
         "columns": [
           {
             "name": "ID",
@@ -73,24 +73,28 @@
           {
             "name": "VehicleBodyTypeID",
             "dataType": "string",
+            "isHidden": true,
             "sourceColumn": "VehicleBodyTypeID",
             "sourceProviderType": "WChar"
           },
           {
             "name": "VehicleMakeID",
             "dataType": "string",
+            "isHidden": true,
             "sourceColumn": "VehicleMakeID",
             "sourceProviderType": "WChar"
           },
           {
             "name": "IssuingAgency",
             "dataType": "string",
+            "isHidden": true,
             "sourceColumn": "IssuingAgency",
             "sourceProviderType": "WChar"
           },
           {
             "name": "ViolationLocation",
             "dataType": "int64",
+            "isHidden": true,
             "sourceColumn": "ViolationLocation",
             "sourceProviderType": "Integer"
           },
@@ -103,6 +107,7 @@
           {
             "name": "ViolationTime",
             "dataType": "int64",
+            "isHidden": true,
             "sourceColumn": "ViolationTime",
             "sourceProviderType": "Integer"
           },
@@ -133,6 +138,7 @@
           {
             "name": "VehicleColorID",
             "dataType": "int64",
+            "isHidden": true,
             "sourceColumn": "VehicleColorID",
             "sourceProviderType": "Integer"
           },
@@ -153,6 +159,20 @@
             "dataType": "string",
             "sourceColumn": "ViolationDescription",
             "sourceProviderType": "WChar"
+          },
+          {
+            "type": "calculated",
+            "name": "IsManhattan",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " if('Fact'[ViolationLocation]<35,1,0)"
+          },
+          {
+            "type": "calculated",
+            "name": "Fee",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "IF('Fact'[IsManhattan]=1,RELATED(DimViolationCode[ManhattanLower]),RELATED(DimViolationCode[Other]))"
           }
         ],
         "partitions": [
@@ -160,29 +180,47 @@
             "name": "Staging",
             "dataView": "full",
             "source": {
-              "query": " SELECT [dbo].[Staging].* FROM [dbo].[Staging] ",
-              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMStaging"
-            }
+              "query": "select * from dbo.DataW",
+              "dataSource": "FactTable"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>select * from dbo.DataW</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+              }
+            ]
           }
         ],
         "measures": [
           {
             "name": "LastDate",
-            "expression": " MAX(Staging[IssueDate])"
+            "expression": " MAX(Fact[IssueDate])"
           },
           {
             "name": "StartDate",
-            "expression": " MIN(Staging[IssueDate])"
+            "expression": " MIN(Fact[IssueDate])"
           },
           {
             "name": "CountRows",
-            "expression": " count(Staging[ID])"
+            "expression": " count(Fact[ID])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "FeeSum",
+            "expression": "sum('Fact'[Fee])",
+            "formatString": "\\$#,0;(\\$#,0);\\$#,0",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"Currency\"><Currency LCID=\"1033\" DisplayName=\"$ English (United States)\" Symbol=\"$\" PositivePattern=\"0\" NegativePattern=\"0\" /></Format>"
+              }
+            ]
           }
         ],
         "annotations": [
           {
             "name": "_TM_ExtProp_QueryDefinition",
-            "value": " SELECT [dbo].[Staging].* FROM [dbo].[Staging] "
+            "value": "select * from dbo.DataW"
           },
           {
             "name": "_TM_ExtProp_DbTableName",
@@ -191,6 +229,10 @@
           {
             "name": "_TM_ExtProp_DbSchemaName",
             "value": "dbo"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>select * from dbo.DataW</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
           }
         ]
       },
@@ -200,6 +242,7 @@
           {
             "name": "ID",
             "dataType": "int64",
+            "isHidden": true,
             "sourceColumn": "ID",
             "sourceProviderType": "Integer"
           },
@@ -216,7 +259,7 @@
             "dataView": "full",
             "source": {
               "query": " SELECT [dbo].[DimBodyType].* FROM [dbo].[DimBodyType] ",
-              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+              "dataSource": "DimTables"
             }
           }
         ],
@@ -241,6 +284,7 @@
           {
             "name": "ID",
             "dataType": "int64",
+            "isHidden": true,
             "sourceColumn": "ID",
             "sourceProviderType": "Integer"
           },
@@ -257,7 +301,7 @@
             "dataView": "full",
             "source": {
               "query": " SELECT [dbo].[DimCarBrands].* FROM [dbo].[DimCarBrands] ",
-              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+              "dataSource": "DimTables"
             }
           }
         ],
@@ -277,52 +321,12 @@
         ]
       },
       {
-        "name": "DimColor",
-        "columns": [
-          {
-            "name": "ID",
-            "dataType": "int64",
-            "sourceColumn": "ID",
-            "sourceProviderType": "Integer"
-          },
-          {
-            "name": "BodyType",
-            "dataType": "string",
-            "sourceColumn": "BodyType",
-            "sourceProviderType": "WChar"
-          }
-        ],
-        "partitions": [
-          {
-            "name": "DimColor",
-            "dataView": "full",
-            "source": {
-              "query": " SELECT [dbo].[DimColor].* FROM [dbo].[DimColor] ",
-              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
-            }
-          }
-        ],
-        "annotations": [
-          {
-            "name": "_TM_ExtProp_QueryDefinition",
-            "value": " SELECT [dbo].[DimColor].* FROM [dbo].[DimColor] "
-          },
-          {
-            "name": "_TM_ExtProp_DbTableName",
-            "value": "DimColor"
-          },
-          {
-            "name": "_TM_ExtProp_DbSchemaName",
-            "value": "dbo"
-          }
-        ]
-      },
-      {
         "name": "DimDistrict",
         "columns": [
           {
             "name": "Pricinct",
             "dataType": "int64",
+            "isHidden": true,
             "sourceColumn": "Pricinct",
             "sourceProviderType": "Integer"
           },
@@ -339,7 +343,7 @@
             "dataView": "full",
             "source": {
               "query": " SELECT [dbo].[DimDistrict].* FROM [dbo].[DimDistrict] ",
-              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+              "dataSource": "DimTables"
             }
           }
         ],
@@ -380,7 +384,7 @@
             "dataView": "full",
             "source": {
               "query": " SELECT [dbo].[DimStates].* FROM [dbo].[DimStates] ",
-              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+              "dataSource": "DimTables"
             }
           }
         ],
@@ -392,6 +396,233 @@
           {
             "name": "_TM_ExtProp_DbTableName",
             "value": "DimStates"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
+          }
+        ]
+      },
+      {
+        "name": "DIMDATE",
+        "dataCategory": "Time",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isKey": true,
+            "sourceColumn": "[Date]"
+          },
+          {
+            "type": "calculated",
+            "name": "Year",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": " YEAR('DIMDATE'[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "QuarterName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": " CONCATENATE(\"Q\", ROUNDUP(MONTH(DIMDATE[Date])/3,0))"
+          },
+          {
+            "type": "calculated",
+            "name": "Month",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": " MONTH(DIMDATE[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "Season",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": " if(DIMDATE[Month]<3,\"Winter\", if(DIMDATE[Month]=12,\"Winter\", if(DIMDATE[Month]<6,\"Spring\", if(DIMDATE[Month]<9,\"Summar\",\"Fall\"))))"
+          },
+          {
+            "type": "calculated",
+            "name": "Day",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": " DAY(DIMDATE[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "Weekday",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": " WEEKDAY(DIMDATE[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "WeekdayName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "FORMAT(DIMDATE[Date],\"DDDD\")"
+          },
+          {
+            "type": "calculated",
+            "name": "MonthName",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": " FORMAT(DIMDATE[Date],\"MMMM\")"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": "CALENDAR(FIRSTDATE(Fact[IssueDate]),LASTDATE(Fact[IssueDate]))"
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "DateH",
+            "levels": [
+              {
+                "name": "Year",
+                "ordinal": 0,
+                "column": "Year"
+              },
+              {
+                "name": "QuarterName",
+                "ordinal": 1,
+                "column": "QuarterName"
+              },
+              {
+                "name": "Month",
+                "ordinal": 2,
+                "column": "Month"
+              },
+              {
+                "name": "Day",
+                "ordinal": 3,
+                "column": "Day"
+              }
+            ]
+          },
+          {
+            "name": "SeasonH",
+            "levels": [
+              {
+                "name": "Year",
+                "ordinal": 0,
+                "column": "Year"
+              },
+              {
+                "name": "Season",
+                "ordinal": 1,
+                "column": "Season"
+              },
+              {
+                "name": "Month",
+                "ordinal": 2,
+                "column": "Month"
+              },
+              {
+                "name": "Day",
+                "ordinal": 3,
+                "column": "Day"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Hours",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Hours",
+            "dataType": "int64",
+            "isNameInferred": false,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Value]"
+          },
+          {
+            "type": "calculated",
+            "name": "TimeOfDay",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": " if(Hours[Hours]<5,\"Night\",if(Hours[Hours]<12,\"Morning\",if(Hours[Hours]<18,\"Afternoon\",if(Hours[Hours]<24,\"Evening\"))))"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": " GENERATESERIES(0,23)"
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Time",
+            "levels": [
+              {
+                "name": "TimeOfDay",
+                "ordinal": 0,
+                "column": "TimeOfDay"
+              },
+              {
+                "name": "Hours",
+                "ordinal": 1,
+                "column": "Hours"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "DimAgency",
+        "columns": [
+          {
+            "name": "Agency Name",
+            "dataType": "string",
+            "sourceColumn": "Agency Name",
+            "sourceProviderType": "WChar"
+          },
+          {
+            "name": "Agency Code",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Agency Code",
+            "sourceProviderType": "WChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimAgency",
+            "dataView": "full",
+            "source": {
+              "query": " SELECT [dbo].[DimAgency].* FROM [dbo].[DimAgency] ",
+              "dataSource": "DimTables"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimAgency].* FROM [dbo].[DimAgency] "
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimAgency"
           },
           {
             "name": "_TM_ExtProp_DbSchemaName",
@@ -433,7 +664,7 @@
             "dataView": "full",
             "source": {
               "query": " SELECT [dbo].[DimViolationCode].* FROM [dbo].[DimViolationCode] ",
-              "dataSource": "SqlServer DESKTOP-575EBG3SQL2017 DFMDW"
+              "dataSource": "DimTables"
             }
           }
         ],
@@ -453,120 +684,44 @@
         ]
       },
       {
-        "name": "DIMDATE",
+        "name": "DimColor",
         "columns": [
           {
-            "type": "calculatedTableColumn",
-            "name": "Date",
-            "dataType": "dateTime",
-            "isNameInferred": true,
-            "isDataTypeInferred": true,
-            "sourceColumn": "[Date]"
-          },
-          {
-            "type": "calculated",
-            "name": "Year",
+            "name": "ID",
             "dataType": "int64",
-            "isDataTypeInferred": true,
-            "expression": " YEAR('DIMDATE'[Date])"
+            "isHidden": true,
+            "sourceColumn": "ID",
+            "sourceProviderType": "Integer"
           },
           {
-            "type": "calculated",
-            "name": "QuarterName",
+            "name": "Color",
             "dataType": "string",
-            "isDataTypeInferred": true,
-            "expression": " CONCATENATE(\"Q\", ROUNDUP(MONTH(DIMDATE[Date])/3,0))"
-          },
-          {
-            "type": "calculated",
-            "name": "Month",
-            "dataType": "int64",
-            "isDataTypeInferred": true,
-            "expression": " MONTH(DIMDATE[Date])"
-          },
-          {
-            "type": "calculated",
-            "name": "Season",
-            "dataType": "string",
-            "isDataTypeInferred": true,
-            "expression": " if(DIMDATE[Month]<3,\"Winter\", if(DIMDATE[Month]=12,\"Winter\", if(DIMDATE[Month]<6,\"Spring\", if(DIMDATE[Month]<9,\"Summar\",\"Fall\"))))"
-          },
-          {
-            "type": "calculated",
-            "name": "Day",
-            "dataType": "int64",
-            "isDataTypeInferred": true,
-            "expression": " DAY(DIMDATE[Date])"
-          },
-          {
-            "type": "calculated",
-            "name": "Weekday",
-            "dataType": "int64",
-            "isDataTypeInferred": true,
-            "expression": " WEEKDAY(DIMDATE[Date])"
-          },
-          {
-            "type": "calculated",
-            "name": "WeekdayName",
-            "dataType": "string",
-            "isDataTypeInferred": true,
-            "expression": "FORMAT(DIMDATE[Date],\"DDDD\")"
-          },
-          {
-            "type": "calculated",
-            "name": "MonthName",
-            "dataType": "string",
-            "isDataTypeInferred": true,
-            "expression": " FORMAT(DIMDATE[Date],\"MMMM\")"
+            "sourceColumn": "Color",
+            "sourceProviderType": "WChar"
           }
         ],
         "partitions": [
           {
-            "name": "CalculatedTable 1",
+            "name": "DimColor",
+            "dataView": "full",
             "source": {
-              "type": "calculated",
-              "expression": "CALENDAR(FIRSTDATE(Staging[IssueDate]),LASTDATE(Staging[IssueDate]))"
+              "query": " SELECT [dbo].[DimColor].* FROM [dbo].[DimColor] ",
+              "dataSource": "DimTables"
             }
-          }
-        ]
-      },
-      {
-        "name": "Hours",
-        "columns": [
-          {
-            "type": "calculatedTableColumn",
-            "name": "Hours",
-            "dataType": "int64",
-            "isNameInferred": false,
-            "isDataTypeInferred": true,
-            "sourceColumn": "[Value]"
-          },
-          {
-            "type": "calculated",
-            "name": "TimeOfDay",
-            "dataType": "string",
-            "isDataTypeInferred": true,
-            "expression": " if(Hours[Hours]<5,\"Night\",if(Hours[Hours]<12,\"Morning\",if(Hours[Hours]<18,\"Afternoon\",if(Hours[Hours]<24,\"Evening\"))))"
           }
         ],
-        "partitions": [
+        "annotations": [
           {
-            "name": "CalculatedTable 1",
-            "source": {
-              "type": "calculated",
-              "expression": " GENERATESERIES(0,23)"
-            }
-          }
-        ]
-      },
-      {
-        "name": "CalculatedTable 1",
-        "partitions": [
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": " SELECT [dbo].[DimColor].* FROM [dbo].[DimColor] "
+          },
           {
-            "name": "CalculatedTable 1",
-            "source": {
-              "type": "calculated"
-            }
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "DimColor"
+          },
+          {
+            "name": "_TM_ExtProp_DbSchemaName",
+            "value": "dbo"
           }
         ]
       }
@@ -574,52 +729,66 @@
     "relationships": [
       {
         "name": "1fc1141f-314d-4538-a671-cb57b2c27680",
-        "fromTable": "Staging",
+        "fromTable": "Fact",
         "fromColumn": "IssueDate",
         "toTable": "DIMDATE",
         "toColumn": "Date"
       },
       {
         "name": "02f68017-8910-47ae-b59f-5f52018e47f0",
-        "fromTable": "Staging",
+        "fromTable": "Fact",
         "fromColumn": "VehicleMakeID",
         "toTable": "DimCarBrands",
         "toColumn": "ID"
       },
       {
         "name": "f8710fc3-b56b-4e80-bc15-4c9693996f97",
-        "fromTable": "Staging",
+        "fromTable": "Fact",
         "fromColumn": "VehicleBodyTypeID",
         "toTable": "DimBodyType",
         "toColumn": "ID"
       },
       {
-        "name": "4f2540ba-fc41-4411-8174-8b7d6a9628fc",
-        "fromTable": "Staging",
+        "name": "17f18260-fb9c-4430-8766-9ff418fa4a9a",
+        "fromTable": "Fact",
+        "fromColumn": "ViolationLocation",
+        "toTable": "DimDistrict",
+        "toColumn": "Pricinct"
+      },
+      {
+        "name": "a05ee22a-fff0-4c36-ae7f-05dec80fe6e3",
+        "fromTable": "Fact",
+        "fromColumn": "IssuingAgency",
+        "toTable": "DimAgency",
+        "toColumn": "Agency Code"
+      },
+      {
+        "name": "6a887dc9-1255-4f9a-acc9-ee69cf52ede2",
+        "fromTable": "Fact",
         "fromColumn": "ViolationCode",
         "toTable": "DimViolationCode",
         "toColumn": "Code"
       },
       {
-        "name": "9777135e-f3a1-4aac-8eba-26bfdedb3505",
-        "fromTable": "Staging",
+        "name": "cc7ab291-eb79-473e-b81c-57c75b28895a",
+        "fromTable": "Fact",
+        "fromColumn": "ViolationCounty",
+        "toTable": "DimStates",
+        "toColumn": "StateCode"
+      },
+      {
+        "name": "12a86376-56e2-4726-ba53-a3d588fb3360",
+        "fromTable": "Fact",
+        "fromColumn": "ViolationTime",
+        "toTable": "Hours",
+        "toColumn": "Hours"
+      },
+      {
+        "name": "2fb7ae8a-1cc0-49cf-97e2-e9053a71e4c7",
+        "fromTable": "Fact",
         "fromColumn": "VehicleColorID",
         "toTable": "DimColor",
         "toColumn": "ID"
-      },
-      {
-        "name": "22536345-8da9-453e-800e-65d41d24c3e4",
-        "fromTable": "Staging",
-        "fromColumn": "RegistrationState",
-        "toTable": "DimStates",
-        "toColumn": "State Name"
-      },
-      {
-        "name": "17f18260-fb9c-4430-8766-9ff418fa4a9a",
-        "fromTable": "Staging",
-        "fromColumn": "ViolationLocation",
-        "toTable": "DimDistrict",
-        "toColumn": "Pricinct"
       }
     ],
     "annotations": [
